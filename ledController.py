@@ -116,53 +116,32 @@ def idleBreathing(strip, input, cycle_period):
     print("exiting")
     return 0
 
-def getInput():
-    print ('Press Ctrl-C to quit.')
-    try:
-        # Burn one line after the LEDs change colors, keeps the leds from constantly chaning
-        burnLine = False
-        while True:
-            if args.user:
-                x = raw_input()
-            else:
-                x = ser.readline()
-            print(x)
-            if not burnLine:
-                if "setLED" in x:
-                    x = x.replace('setLED','')
-                    r = x[:2]
-                    g = x[3:5]
-                    b = x[6:8]
-                    #For some reason Color()/Our LED uses green-red-blue insteado of red-green-blue, when sending send the format in rrrgggbbb, but this will change it to the correct order
-                    setColor = (int(g), int(r), int(b))
-                #if "purple" in x:
-                #    colorWipe(strip, Color(0, 75, 127))
-                #    time.sleep(1)
-                #    colorWipe(strip, Color(0, 0, 0), 10)
-                #    burnLine = True;
-                #if "red" in x:
-                #    colorWipe(strip, Color(0, 127, 0))
-                #    time.sleep(1)
-                #    colorWipe(strip, Color(0, 0, 0), 10)
-                #    burnLine = True;
-                if "on" in x: 
-                    glow(strip, setColor)
-                    time.sleep(1)
-                    glowout(strip)
-                    burnLine = True;
-                #if "purple" in x:
-                #    glow(strip, Color(0, 75, 127))
-                #    time.sleep(1)
-                #    glowout(strip)
-                #    burnLine = True;
-                #if "yellow" in x:
-                #    glow(strip, Color(75, 75, 0))
-                #    time.sleep(1)
-                #    glowout(strip)
-                #    burnLine = True;
+def setColor(x, methodName):
+    x = x.replace(methodName,'')
+    r = x[:2]
+    g = x[3:5]
+    b = x[6:8]
+    return r, g, b
 
-            else:
-                burnLine = False
+def getInput():
+    burnLine = False
+    x = ser.readline()
+    if not burnLine:
+        if "idleBreath" in x:
+            NEXT_STATE = IDLE_BREATHING
+        elif "shutdown" in x:
+            NEXT_STATE = SHUTDOWN
+        elif "greeting" in x:
+            NEXT_STATE = GREETING
+        elif "setLED" in x: # Will most likely be removed, but a good example of parsing input for parameters
+            x = x.replace('setLED','')
+            r = x[:2]
+            g = x[3:5]
+            b = x[6:8]
+            setColor = (int(g), int(r), int(b))
+        burnLine = True
+    else:
+        burnLine = False
 
 
 if __name__ == '__main__':
