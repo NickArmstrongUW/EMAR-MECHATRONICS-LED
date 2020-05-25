@@ -23,6 +23,7 @@ B_WHITE = 255
 G_WHITE = 202
 NEXT_STATE = "IDLE_BREATHING"
 CURRENT_STATE = "IDLE_BREATHING"
+CURRENT_GRB = (0, 0, 0)
 
 #ser = serial.Serial(
 #        port = '/dev/ttyS0',
@@ -117,12 +118,11 @@ def idleBreathing(strip, input, cycle_period):
     return 0
 
 def greeting(strip, cycle_period):
-    strip.brightness = 255
     cycle_ms = cycle_period * 1000
     wait_ms = cycle_ms / 255
     delta_r = (255 - CURRENT_GRB[0]) / 255
     delta_g = (255 - CURRENT_GRB[1]) / 255
-    delta_b = (0 - CURRENT_GRB[2]) / 255
+    delta_b = (CURRENT_GRB[2] - 0) / 255
     grb = CURRENT_GRB
 
     while STATE is "GREETING":
@@ -136,28 +136,61 @@ def greeting(strip, cycle_period):
             r = 255
         if b < 0: 
             b = 0
-        strip.fill(g, r, b)
-        strip.show()
-        time.sleep(wait_ms/1000)
+        # strip.fill(255, 255, 0)
+        # for i in range(0, 255):
+            # strip.setBrightness(i)
+            # strip.show()
+            # time.sleep(wait_ms/1000)
+
 
 def getInput():
-    burnLine = False
-    x = ser.readline()
-    if not burnLine:
-        if "idleBreath" in x:
-            NEXT_STATE = IDLE_BREATHING
-        elif "shutdown" in x:
-            NEXT_STATE = SHUTDOWN
-        elif "greeting" in x:
-            NEXT_STATE = GREETING
-        elif "setLED" in x: # Will most likely be removed, but a good example of parsing input for parameters
-            x = x.replace('setLED','')
-            r = x[:2]
-            g = x[3:5]
-            b = x[6:8]
-            setColor = (int(g), int(r), int(b))
-        else:
-            burnLine = False
+    print ('Press Ctrl-C to quit.')
+    try:
+        # Burn one line after the LEDs change colors, keeps the leds from constantly chaning
+        burnLine = False
+        while True:
+            if args.user:
+                x = raw_input()
+            else:
+                x = ser.readline()
+            print(x)
+            if not burnLine:
+                if "setLED" in x:
+                    x = x.replace('setLED','')
+                    r = x[:2]
+                    g = x[3:5]
+                    b = x[6:8]
+                    #For some reason Color()/Our LED uses green-red-blue insteado of red-green-blue, when sending send the format in rrrgggbbb, but this will change it to the correct order
+                    setColor = (int(g), int(r), int(b))
+                #if "purple" in x:
+                #    colorWipe(strip, Color(0, 75, 127))
+                #    time.sleep(1)
+                #    colorWipe(strip, Color(0, 0, 0), 10)
+                #    burnLine = True;
+                #if "red" in x:
+                #    colorWipe(strip, Color(0, 127, 0))
+                #    time.sleep(1)
+                #    colorWipe(strip, Color(0, 0, 0), 10)
+                #    burnLine = True;
+                if "on" in x: 
+                    glow(strip, setColor)
+                    time.sleep(1)
+                    glowout(strip)
+                    burnLine = True;
+                #if "purple" in x:
+                #    glow(strip, Color(0, 75, 127))
+                #    time.sleep(1)
+                #    glowout(strip)
+                #    burnLine = True;
+                #if "yellow" in x:
+                #    glow(strip, Color(75, 75, 0))
+                #    time.sleep(1)
+                #    glowout(strip)
+                #    burnLine = True;
+
+            else:
+                burnLine = False
+
 
 if __name__ == '__main__':
     
