@@ -23,6 +23,7 @@ B_WHITE = 255
 G_WHITE = 202
 NEXT_STATE = "IDLE_BREATHING"
 CURRENT_STATE = "IDLE_BREATHING"
+CURRENT_GRB = (0, 0, 0)
 
 #ser = serial.Serial(
 #        port = '/dev/ttyS0',
@@ -96,6 +97,7 @@ def idleBreathing(strip, input, cycle_period):
             if b > B_WHITE:
                 b = B_WHITE
         grb = (g, r, b)
+        CURRENT_GRB = grb
         print("grb: ", grb)
 
         # directional check
