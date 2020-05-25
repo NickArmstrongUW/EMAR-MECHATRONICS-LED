@@ -116,12 +116,26 @@ def idleBreathing(strip, input, cycle_period):
     print("exiting")
     return 0
 
+<<<<<<< Updated upstream
 def setColor(x, methodName):
     x = x.replace(methodName,'')
     r = x[:2]
     g = x[3:5]
     b = x[6:8]
     return r, g, b
+=======
+def greeting(strip, cycle_period):
+    cycle_ms = cycle_period * 1000
+    wait_ms = cycle_ms / 100
+
+    while STATE is "GREETING":
+        strip.fill(255, 255, 0)
+        # strip.fill(0, 0, 255)
+        for j in range(0, 255):
+            strip.setBrightness(j)
+            strip.show()
+            time.sleep(wait_ms/1000)
+>>>>>>> Stashed changes
 
 def getInput():
     burnLine = False
